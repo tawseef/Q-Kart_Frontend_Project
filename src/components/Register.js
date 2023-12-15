@@ -7,20 +7,19 @@ import { config } from "../App";
 import Footer from "./Footer";
 import Header from "./Header";
 import "./Register.css";
+import { useHistory } from "react-router-dom";
 
 const Register = () => {
   const { enqueueSnackbar } = useSnackbar();
-  
+  const history = useHistory();
 
 
-  // TODO: CRIO_TASK_MODULE_REGISTER - Implement the register function
   /**
    * Definition for register handler
    * - Function to be called when the user clicks on the register button or submits the register form
    *
-   * @param {{ username: string, password: string, confirmPassword: string }} userDetail
+   * @param {{ username: string, password: string, confirmPassword: string }} formData
    *  Object with values of username, password and confirm password user entered to register
-   * 
    *
    * API endpoint - "POST /auth/register"
    *
@@ -40,6 +39,7 @@ const Register = () => {
   const  [userDetail, setUserDetail] = useState({username : "", password : "", confirmPassword : "" });
 
   const [formStatus, setFormStatus] = useState("unsubmitted");
+  const [headerProp, setHeaderProp] = useState(false);
 
   const register = (userDetail) => {
     const validation = validateInput(userDetail);
@@ -47,21 +47,23 @@ const Register = () => {
       setFormStatus("submitted");
       (async ()=>{
         try{
-          console.log(`${config.endpoint}/auth/register`);    
+          // console.log(`${config.endpoint}/auth/register`);    
           const posting = await axios.post(`${config.endpoint}/auth/register`, {username:userDetail.username, password:userDetail.password});
-          console.log("posting.status");
-          console.log(posting.status);
+          // console.log("posting.status");
+          // console.log(posting.status);
           if(posting.status===201){
-            enqueueSnackbar("Registered Successfully");
+            enqueueSnackbar("Registered Successfully", {variant:"success"}); 
+            setHeaderProp(true);             
+            history.push("/login");
           }
           setFormStatus("unsubmitted");
         }catch(e){
           setFormStatus("submitted");
           console.log("Error")
           if(e.response.status === 400)
-          enqueueSnackbar(e.response.data.message);
+          enqueueSnackbar(e.response.data.message, {variant:"error"});
           else
-          enqueueSnackbar("Something went wrong. Check that the backend is running, reachable and returns valid JSON");
+          enqueueSnackbar("Something went wrong. Check that the backend is running, reachable and returns valid JSON", {variant:"error"});
           
           setFormStatus("unsubmitted");
           return null;
@@ -89,24 +91,18 @@ const Register = () => {
    */
   const validateInput = (data) => {
     if(data.username === ""){
-      enqueueSnackbar("Username is a required field");
+      enqueueSnackbar("Username is a required field", {variant:"warning"});
     }else if(parseInt(data.username.length)<=5){
-      enqueueSnackbar("Username must be at least 6 characters");
+      enqueueSnackbar("Username must be at least 6 characters", {variant:"warning"});
     }else if(data.password === ""){
-      enqueueSnackbar("Password is a required field");
+      enqueueSnackbar("Password is a required field", {variant:"warning"});
     }else if(parseInt(data.password.length)<=5){
-      enqueueSnackbar("Password must be at least 6 characters");
+      enqueueSnackbar("Password must be at least 6 characters", {variant:"warning"});
     }else if(data.password !== data.confirmPassword){
-      enqueueSnackbar("Passwords do not match")
+      enqueueSnackbar("Passwords do not match", {variant:"warning"})
     }else{
       return true;
     }
-
-    // const { name, value } = data.target;
-    // setUserDetail((prevProps) => ({
-    //   ...prevProps,
-    //   [name]: value
-    // }));
   };
 
   const handelInputChange = (e) => {
@@ -115,15 +111,15 @@ const Register = () => {
       ...prevProps,
       [name]: value
     }));    
+
+    // let newFormData = {...userDetail}
+    // newFormData[e.target.name] =e.target.value
+    // setUserDetail(newFormData);
   }
 
-  // const handelInputChange = (e) =>{
-  //   const {name, value} = e.target;
-
-  //   setUserDetail((prevProp)=>{...prevProp, [name]:value});
-  // }
-
-  const theRegisterButton= (<Button className="button" variant="contained" onClick={()=>{register(userDetail)}}>
+  const theRegisterButton= (<Button className="button" variant="contained" onClick={()=>{
+    register(userDetail)
+    }}>
   Register Now
  </Button>);
 
@@ -174,7 +170,7 @@ const Register = () => {
            {formStatus === "unsubmitted" ? theRegisterButton : <div className="spinner"><CircularProgress color="success"/></div>}
           <p className="secondary-action">
             Already have an account?{" "}
-             <a className="link" href="#">
+             <a className="link" href="./login">
               Login here
              </a>
           </p>
