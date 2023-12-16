@@ -7,7 +7,6 @@ import { useHistory } from "react-router-dom";
 import "./Header.css";
 
 const Header = ({ children, hasHiddenAuthButtons }) => {
-  console.log(hasHiddenAuthButtons)
   const [loggedUser, setLoggedUser] = useState("");
   const { enqueueSnackbar } = useSnackbar();
 
@@ -76,29 +75,13 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
     }
   }, [hasHiddenAuthButtons]); 
 
- 
-
-  // if (Boolean(localStorage.getItem("username"))) {
-  //   btn = logoutBtn;
-  // }else if (
-  //   history.location.pathname === "/login" ||
-  //   history.location.pathname === "/register"
-  // ) {
-  //   btn = backToExploreBtn;
-  // } else if (history.location.pathname === "/") {
-  //   // btn = <><>{registerBtn}</> <>{loginBtn} </></>
-  //   btn = <div>{loginBtn}{registerBtn} </div>
-  //   // btn = registerBtn, loginBtn
-  // }
 
   if (Boolean(localStorage.getItem("username"))) {
     btn = logoutBtn;
   }else if (hasHiddenAuthButtons === undefined) {
     btn = <div>{loginBtn}{registerBtn} </div>
   } else if (hasHiddenAuthButtons) {
-    // btn = <><>{registerBtn}</> <>{loginBtn} </></>
     btn = backToExploreBtn;
-    // btn = registerBtn, loginBtn
   }
 
 
@@ -108,8 +91,6 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
         <img src="logo_light.svg" alt="QKart-icon"></img>
       </Box>
       { btn }
-      {/* {hasHiddenAuthButtons === false ? backToExploreBtn : btn} */}
-      {/* {(hasHiddenAuthButtons === false && hasHiddenAuthButtons !==undefined ) ? backToExploreBtn : logoutBtn } */}
     </Box>
   );
 };
