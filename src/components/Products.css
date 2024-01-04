@@ -1,5 +1,6 @@
 .search {
-  min-width: 24rem;
+  margin-top: 5px;
+  min-width: 40rem;
   position: relative;
   left: 4rem;
 }
@@ -50,6 +51,7 @@
 
 .search-desktop {
   display: none !important;
+  min-width: 500px !important;
 }
 
 

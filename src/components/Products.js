@@ -176,6 +176,7 @@ const Products = () => {
         size="small"
         // fullWidth
         InputProps={{
+          className:"search",
           endAdornment: (
             <InputAdornment position="end">
               <Search color="primary" />
@@ -218,7 +219,7 @@ const Products = () => {
                India’s <span className="hero-highlight">FASTEST DELIVERY</span>{" "}
                to your door step
              </p>
-             
+            
            </Box>
          </Grid>
        </Grid>
