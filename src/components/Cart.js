@@ -10,6 +10,8 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import "./Cart.css";
 
+
+
 // Definition of Data Structures used
 /**
  * @typedef {Object} Product - Data on product available to buy
@@ -47,8 +49,30 @@ import "./Cart.css";
  *    Array of objects with complete data on products in cart
  *
  */
+
+
+// export const generateCartItemsFrom = (cartData, productsData) => {
+//   if(cartData){
+//     let newArray = cartData.map(obj1 => { 
+//       let obj2 = productsData.find(obj3 => obj3._id === obj1.productId); 
+//       return { ...obj1, ...obj2 }; 
+//     });
+//     return newArray;
+//   }else{
+//     return null;
+//   }
+// };
+
 export const generateCartItemsFrom = (cartData, productsData) => {
+  if (!cartData) return;
+
+  const nextCart = cartData.map((item) => ({
+    ...item,
+    ...productsData.find((product) => item.productId === product._id),
+  }));
+  return nextCart;
 };
+
 
 /**
  * Get the total value of all products added to the cart
@@ -60,8 +84,15 @@ export const generateCartItemsFrom = (cartData, productsData) => {
  *    Value of all items in the cart
  *
  */
+
 export const getTotalCartValue = (items = []) => {
-};
+  if(items){
+    return items.reduce((acc,item)=> acc+(item.qty*item.cost),0);
+  }else{
+    return 0;
+  }
+}
+
 
 
 /**
@@ -83,7 +114,23 @@ const ItemQuantity = ({
   handleAdd,
   handleDelete,
 }) => {
+  return (
+    <Stack direction="row" alignItems="center">
+      <IconButton size="small" color="primary" onClick={handleDelete}>
+        <RemoveOutlined />
+      </IconButton>
+      <Box padding="0.5rem" data-testid="item-qty">
+        {value}
+      </Box>
+      <IconButton size="small" color="primary" onClick={handleAdd}>
+        <AddOutlined />
+      </IconButton>
+    </Stack>
+  );
 };
+
+
+
 
 /**
  * Component to display the Cart view
@@ -105,6 +152,12 @@ const Cart = ({
   handleQuantity,
 }) => {
 
+  const history= useHistory();
+  
+  const toCheckoutPage= () =>{
+    history.push("/checkout");
+  }
+
   if (!items.length) {
     return (
       <Box className="cart empty">
@@ -114,11 +167,61 @@ const Cart = ({
         </Box>
       </Box>
     );
-  }
-
+  } 
+  
   return (
     <>
       <Box className="cart">
+        {/* TODO: CRIO_TASK_MODULE_CART - Display view for each cart item with non-zero quantity */} 
+        {items.map((item) => (
+          <Box key={item.productId}>
+            {item.qty>0 ?
+            
+            <Box display="flex" alignItems="flex-start" padding="1rem">
+            <Box className="image-container">
+                <img
+                    // Add product image
+                    src={item.image}
+                    // Add product name as alt eext
+                    alt={item.name}
+                    width="100%"
+                    height="100%"
+                />
+            </Box>
+            <Box
+                display="flex"
+                flexDirection="column"
+                justifyContent="space-between"
+                height="6rem"
+                paddingX="1rem"
+            >
+                <div>{item.name}</div>
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                >
+                <ItemQuantity 
+                // Add required props by checking implementation
+                value={item.qty} 
+                handleAdd={async ()=>{
+                  await handleQuantity( localStorage.getItem("token"), item, products, item.productId, item.qty+1);
+                } } 
+                handleDelete={async ()=>{
+                  await handleQuantity( localStorage.getItem("token"), item, products, item.productId, item.qty-1);
+                } }
+                />
+                <Box padding="0.5rem" fontWeight="700">
+                    ${item.cost}
+                </Box>
+                </Box>
+            </Box>
+          </Box>
+            
+            : false}
+          </Box>
+        ))}       
+       
         <Box
           padding="1rem"
           display="flex"
@@ -139,6 +242,18 @@ const Cart = ({
           </Box>
         </Box>
 
+        <Box display="flex" justifyContent="flex-end" className="cart-footer">
+          <Button
+            color="primary"
+            variant="contained"
+            startIcon={<ShoppingCart />}
+            className="checkout-btn"
+            onClick={toCheckoutPage}
+            // onClick={history.push("/checkout")}
+          >
+            Checkout
+          </Button>
+        </Box>
       </Box>
     </>
   );
