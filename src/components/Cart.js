@@ -94,7 +94,24 @@ export const getTotalCartValue = (items = []) => {
 }
 
 
+// TODO: CRIO_TASK_MODULE_CHECKOUT - Implement function to return total cart quantity
+/**
+ * Return the sum of quantities of all products added to the cart
+ *
+ * @param { Array.<CartItem> } items
+ *    Array of objects with complete data on products in cart
+ *
+ * @returns { Number }
+ *    Total quantity of products added to the cart
+ *
+ */
+export const getTotalItems = (items = []) => {
+  const totalItems = items.reduce((acc, ele)=>acc+ele.qty,0);
+  return (totalItems);
+};
 
+
+// TODO: CRIO_TASK_MODULE_CHECKOUT - Add static quantity view for Checkout page cart
 /**
  * Component to display the current quantity for a product and + and - buttons to update product quantity on cart
  * 
@@ -107,13 +124,22 @@ export const getTotalCartValue = (items = []) => {
  * @param {Function} handleDelete
  *    Handler function which reduces the quantity of a product in cart by 1
  * 
+ * @param {Boolean} isReadOnly
+ *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  * 
  */
 const ItemQuantity = ({
   value,
   handleAdd,
   handleDelete,
+  isReadOnly = false
 }) => {
+  // console.log("ItemQuantityFunction");
+
+  if(isReadOnly){
+    return <Box>Qty:{value}</Box>;
+  }
+
   return (
     <Stack direction="row" alignItems="center">
       <IconButton size="small" color="primary" onClick={handleDelete}>
@@ -144,17 +170,20 @@ const ItemQuantity = ({
  * @param {Function} handleDelete
  *    Current quantity of product in cart
  * 
+ * @param {Boolean} isReadOnly
+ *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  * 
  */
 const Cart = ({
   products,
   items = [],
   handleQuantity,
+  isReadOnly
 }) => {
 
   const history= useHistory();
   
-  const toCheckoutPage= () =>{
+  const toCheckoutPage = () =>{
     history.push("/checkout");
   }
 
@@ -174,10 +203,10 @@ const Cart = ({
       <Box className="cart">
         {/* TODO: CRIO_TASK_MODULE_CART - Display view for each cart item with non-zero quantity */} 
         {items.map((item) => (
-          <Box key={item.productId}>
+          <Box key={item.productId} >
             {item.qty>0 ?
             
-            <Box display="flex" alignItems="flex-start" padding="1rem">
+            <Box display="flex" alignItems="flex-start" padding="1rem"  className="bgwhite">
             <Box className="image-container">
                 <img
                     // Add product image
@@ -202,7 +231,7 @@ const Cart = ({
                     alignItems="center"
                 >
                 <ItemQuantity 
-                // Add required props by checking implementation
+                // Add required props by checking implementation 
                 value={item.qty} 
                 handleAdd={async ()=>{
                   await handleQuantity( localStorage.getItem("token"), item, products, item.productId, item.qty+1);
@@ -210,6 +239,7 @@ const Cart = ({
                 handleDelete={async ()=>{
                   await handleQuantity( localStorage.getItem("token"), item, products, item.productId, item.qty-1);
                 } }
+                isReadOnly={isReadOnly}
                 />
                 <Box padding="0.5rem" fontWeight="700">
                     ${item.cost}
@@ -227,8 +257,9 @@ const Cart = ({
           display="flex"
           justifyContent="space-between"
           alignItems="center"
+          className="bgwhite"
         >
-          <Box color="#3C3C3C" alignSelf="center">
+          <Box color="#3C3C3C" alignSelf="center" >
             Order total
           </Box>
           <Box
@@ -242,18 +273,56 @@ const Cart = ({
           </Box>
         </Box>
 
-        <Box display="flex" justifyContent="flex-end" className="cart-footer">
-          <Button
-            color="primary"
-            variant="contained"
-            startIcon={<ShoppingCart />}
-            className="checkout-btn"
-            onClick={toCheckoutPage}
-            // onClick={history.push("/checkout")}
-          >
-            Checkout
-          </Button>
-        </Box>
+        {isReadOnly ? 
+          <Box bgcolor="white"> 
+            <Box><hr />
+              <Box fontSize="1.5rem" justifyContent="flex-start" paddingX="1rem">
+                Order Details
+              </Box>
+              <Box  className="cart-row" paddingX="1rem">
+                Products
+                  <Box>
+                    {getTotalItems(items)}
+                  </Box>
+              </Box>
+
+                <Box className="cart-row" paddingX="1rem">
+                  Subtotal
+                  <Box>
+                    ${getTotalCartValue(items)}
+                  </Box>
+                </Box>
+
+                <Box className="cart-row" paddingX="1rem">
+                  Shipping Charges
+                  <Box>
+                    $0
+                  </Box>
+                </Box>
+
+                <Box fontSize="1.5rem" className="cart-row" paddingY="0.5rem" paddingX="1rem">
+                  Total
+                  <Box>
+                    ${getTotalCartValue(items)}
+                  </Box>
+              </Box>
+            </Box>
+          </Box>
+        
+        :
+          <Box display="flex" justifyContent="flex-end" className="cart-footer bgwhite">
+            <Button
+              color="primary"
+              variant="contained"
+              startIcon={<ShoppingCart />}
+              className="checkout-btn"
+              onClick={()=>{toCheckoutPage()}}
+            >
+              Checkout
+            </Button>
+          </Box>
+        }
+
       </Box>
     </>
   );

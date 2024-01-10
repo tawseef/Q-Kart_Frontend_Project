@@ -343,6 +343,7 @@ const Products = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        
         setResponse(postcall.data);
         const gen = generateCartItemsFrom(postcall.data, products);
         setInitialCart(gen);
@@ -418,7 +419,7 @@ const Products = () => {
             marginY={2}
             paddingX={2}
           >
-            <Grid item sm={8} md={8}>
+            <Grid item sm={8} md={9}>
               <Grid container>
                 <Grid item className="product-grid">
                   <Box className="hero">
@@ -444,8 +445,9 @@ const Products = () => {
                 )}
               </Grid>
             </Grid>
-            <Grid item sm={7} md={4}>
-              <Cart
+            <Grid container item xs={12} md={3} style={{ backgroundColor: "#E9F5E1", height: "100vh" }} justifyContent="center"
+        alignItems="stretch">
+              <Cart 
                 items={initialCart}
                 products={productList}
                 handleQuantity={addToCart}

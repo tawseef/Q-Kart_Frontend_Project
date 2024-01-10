@@ -19,7 +19,7 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
       variant="text"
       onClick={() => {
         localStorage.clear();
-        enqueueSnackbar("Logged out successfully");        
+        enqueueSnackbar("Logged out successfully" , {variant:"info"});        
         setLoggedUser("")
         // window.location.reload()
         history.push("/");

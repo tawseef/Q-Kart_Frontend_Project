@@ -61,7 +61,7 @@ const Login = () => {
               posting.data.username,
               posting.data.balance
             );
-            enqueueSnackbar("Logged in successfully");
+            enqueueSnackbar("Logged in successfully", {variant:"success"});
             setHeaderProp(true);
             history.push("/");
             setFormStatus("unsubmitted");
@@ -71,10 +71,10 @@ const Login = () => {
           setFormStatus("submitted");
           // console.log("Error")
           if (e.response.status === 400)
-            enqueueSnackbar(e.response.data.message);
+            enqueueSnackbar(e.response.data.message, {variant:"error"});
           else
             enqueueSnackbar(
-              "Something went wrong. Check that the backend is running, reachable and returns valid JSON"
+              "Something went wrong. Check that the backend is running, reachable and returns valid JSON", {variant:"error"}
             );
 
           setFormStatus("unsubmitted");
